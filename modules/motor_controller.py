@@ -48,31 +48,38 @@ class MotorController(object):
         # NOTE: hardware PWM dutycycle 0-1000000
         self.__pi.hardware_PWM(self.__R_PWM_PIN, self.__PWM_FREQUENCY, abs(int(value_r * 1000000)))
         self.__pi.hardware_PWM(self.__L_PWM_PIN, self.__PWM_FREQUENCY, abs(int(value_l * 1000000)))
-        if value_r == 0 and value_l == 0: # 停止（非ブレーキ）
+        if value_r == 0 and value_l == 0: # 停止（ニュートラル）
+            print("ニュートラル")
             self.__pi.write(self.__R1_INPUT, 0)
             self.__pi.write(self.__L1_INPUT, 0)
             self.__pi.write(self.__R2_INPUT, 0)
             self.__pi.write(self.__L2_INPUT, 0)
         elif value_r >= 0 and value_l >= 0: # 前進
+            # print("前進")
             self.__pi.write(self.__R1_INPUT, 1)
             self.__pi.write(self.__L1_INPUT, 1)
             self.__pi.write(self.__R2_INPUT, 0)
             self.__pi.write(self.__L2_INPUT, 0)
         elif value_r >= 0 and value_l <= 0: # 左折
+            # print("左折")
             self.__pi.write(self.__R1_INPUT, 1)
             self.__pi.write(self.__L1_INPUT, 0)
             self.__pi.write(self.__R2_INPUT, 0)
             self.__pi.write(self.__L2_INPUT, 1)
         elif value_r <= 0 and value_l >= 0: # 右折
+            # print("右折")
             self.__pi.write(self.__R1_INPUT, 0)
             self.__pi.write(self.__L1_INPUT, 1)
             self.__pi.write(self.__R2_INPUT, 1)
             self.__pi.write(self.__L2_INPUT, 0)
-        elif value_r >= 0 and value_l >= 0: # 後進
+        elif value_r <= 0 and value_l <= 0: # 後進
+            # print("後進")
             self.__pi.write(self.__R1_INPUT, 0)
             self.__pi.write(self.__L1_INPUT, 0)
             self.__pi.write(self.__R2_INPUT, 1)
             self.__pi.write(self.__L2_INPUT, 1)
+        # else:
+            # print("該当なし")
 
 
     def __calc_radius(self, value_x=0, value_y=0):
@@ -88,11 +95,13 @@ class MotorController(object):
     # value_y 前進、後進とモーターの出力を決定する
     def apply_operation(self, value_x=0, value_y=0):
         radius = self.__calc_radius(value_x, value_y)
+        # print(radius)
         stick_val_sin = value_x / radius
         if stick_val_sin >= self.__spin_turn_stick_val_sin: # 超信地旋回
             self.__operate_motor(value_x, -1*value_x)
             return
-        front_or_back = np.sign(value_y)
+        front_or_back = np.sign(value_y) # y 軸の方向によって前後の回転量が決まる
+        # print(front_or_back)
         if value_x >= 0:
             self.__operate_motor(front_or_back*(radius - value_x), front_or_back*radius)
             return
