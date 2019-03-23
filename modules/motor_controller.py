@@ -1,18 +1,18 @@
 '''
-GPIOからモーターを制御するクラス
-Raspberry Pi Zero 専用（他のボードではピン番号が異なるため）
-Author:Takahiro55555
+    GPIOからモーターを制御するクラス
+    Raspberry Pi Zero W で動作確認
+    Author:Takahiro55555
 
-MOTOR DRIVER : TA7291P
-____________________________________
-| IN1 | IN2 | OUT1 | OUT2 |  MODE  |
-------------------------------------
-|  0  |  0  |  ∞   |  ∞   |  STOP  |
-|  1  |  0  |  H   |  L   | CW/CCW | *
-|  0  |  1  |  L   |  H   | CCW/CW |
-|  1  |  1  |  L   |  L   |  BRAKE |
-""""""""""""""""""""""""""""""""""""
-* の状態を前進とする
+    MOTOR DRIVER : TA7291P
+    ____________________________________
+    | IN1 | IN2 | OUT1 | OUT2 |  MODE  |
+    ------------------------------------
+    |  0  |  0  |  ∞   |  ∞   |  STOP  |
+    |  1  |  0  |  H   |  L   | CW/CCW | *
+    |  0  |  1  |  L   |  H   | CCW/CW |
+    |  1  |  1  |  L   |  L   |  BRAKE |
+    """"""""""""""""""""""""""""""""""""
+    * の状態を前進とする
 '''
 import pigpio, time
 import numpy as np
