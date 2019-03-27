@@ -19,13 +19,13 @@ import numpy as np
 class MotorController(object):
     """docstring for MotorController."""
     def __init__(self):
-        self.__R_PWM_PIN = 18
-        self.__L_PWM_PIN = 13
+        self.__L_PWM_PIN = 18
+        self.__R_PWM_PIN = 13
         self.__PWM_FREQUENCY = 10000 # 10kHz
-        self.__R1_INPUT = 27
-        self.__R2_INPUT = 22
-        self.__L1_INPUT = 6
-        self.__L2_INPUT = 5
+        self.__L1_INPUT = 27
+        self.__L2_INPUT = 22
+        self.__R1_INPUT = 6
+        self.__R2_INPUT = 5
 
         self.__pi = pigpio.pi()
         self.__output_pin_list = [self.__R_PWM_PIN, self.__L_PWM_PIN, self.__R1_INPUT, self.__R2_INPUT, self.__L1_INPUT, self.__L2_INPUT]
@@ -38,12 +38,13 @@ class MotorController(object):
         # モーターの回転方向が変化する操作受付時の時間を入力
         # 一時停止処理終了時に0にする
         self.__r_direction_changed_ms = 0
-        self.__l_direction_changed_ms = 0
+            self.__l_direction_changed_ms = 0
 
 
     # モーターの出力と回転方向を変更する（pwm）
     # 回転方向逆転時の停止処理は無い
     # WARNING: -1.0 <= value_l, value_r <= 1.0
+    # HACK: PWM制御とそれ以外の信号制御の処理は分けるべきかも
     def __operate_motor(self, value_r=0, value_l=0):
         # NOTE: hardware PWM dutycycle 0-1000000
         self.__pi.hardware_PWM(self.__R_PWM_PIN, self.__PWM_FREQUENCY, abs(int(value_r * 1000000)))
@@ -96,7 +97,7 @@ class MotorController(object):
     def apply_operation(self, value_x=0, value_y=0):
         radius = self.__calc_radius(value_x, value_y)
         # print(radius)
-        stick_val_sin = value_x / radius
+        stick_val_sin = abs(value_x) / radius
         if stick_val_sin >= self.__spin_turn_stick_val_sin: # 超信地旋回
             self.__operate_motor(value_x, -1*value_x)
             return
