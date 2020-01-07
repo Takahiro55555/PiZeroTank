@@ -6,6 +6,7 @@
 from threading import Lock
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit, disconnect
+from datetime import datetime
 
 from modules.motor_controller import MotorController
 mtr_ctrl = MotorController()
@@ -37,6 +38,9 @@ def background_thread():
 def index():
     return render_template('controller.html', async_mode=socketio.async_mode)
 
+@app.route('/test/')
+def test():
+    return render_template('test.html', async_mode=socketio.async_mode)
 
 @socketio.on('my_event', namespace='/test')
 def test_message(message):
@@ -46,7 +50,8 @@ def test_message(message):
 
     if message['b'] == 1:
         mtr_ctrl.apply_brake()
-        print("breake")
+        now = datetime.now()
+        print("{0} : breake".format(now))
     else:
         mtr_ctrl.apply_operation(message['x'], message['y'])
 

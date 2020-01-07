@@ -12,38 +12,24 @@
    -->
     <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.5/socket.io.min.js"></script>
+    <script type="text/javascript" src="/static/scripts/controller_keyboard.js"></script>
     <script type="text/javascript" charset="utf-8">
 
     namespace = '/test';
-    // Connect to the Socket.IO server.
-    // The connection URL has the following format:
-    //     http[s]://<domain>:<port>[/<namespace>]
+
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port + namespace);
-    // Event handler for new connections.
-    // The callback function is invoked when a connection with the
-    // server is established.
     socket.on('connect', function() {
         socket.emit('my_event', {data: 'I\'m connected!'});
     });
-    // Event handler for server sent data.
-    // The callback function is invoked whenever the server emits data
-    // to the client. The data is then displayed in the "Received"
-    // section of the page.
     socket.on('my_response', function(msg) {
         $('#log').append('<br>' + $('<div/>').text('Received $ ' + 'x:' + msg.x + ' y:' + msg.y + ' b: ' + msg.b).html());
     });
-    // Interval function that tests message latency by sending a "ping"
-    // message. The server then responds with a "pong" message and the
-    // round trip time is measured.
     var ping_pong_times = [];
     var start_time;
     window.setInterval(function() {
         start_time = (new Date).getTime();
         socket.emit('my_ping');
     }, 1000);
-    // Handler for the "pong" message. When the pong is received, the
-    // time from the ping is stored, and the average of the last 30
-    // samples is average and displayed.
     socket.on('my_pong', function() {
         var latency = (new Date).getTime() - start_time;
         ping_pong_times.push(latency);
@@ -55,48 +41,7 @@
     });
 
     document.onkeydown = keydown;
-    function keydown() {
-        target = document.getElementById("message");
-        target.innerHTML = "キーが押されました KeyCode :" + event.keyCode;
-
-        if(event.keyCode == 87){ // w キー
-          if(event.shiftKey == true){ // ダッシュ
-            socket.emit('my_event', {"x": 0, "y":1, "b":0});
-            return false;
-          }
-          socket.emit('my_event', {"x": 0.0, "y":0.5, "b":0});
-          return false;
-        }else if(event.keyCode == 83){  // s キー
-          if(event.shiftKey == true){ // ダッシュ
-            socket.emit('my_event', {"x": 0, "y":-1, "b":0});
-            return false;
-          }
-          socket.emit('my_event', {"x": 0.0, "y":-0.5, "b":0});
-          return false;
-        }else if(event.keyCode == 68){ // d キー
-          if(event.shiftKey == true){ // 超信地旋回
-            socket.emit('my_event', {"x": 0.707, "y":0, "b":0});
-            return false;
-          }
-          socket.emit('my_event', {"x": 0.424, "y":0.424, "b":0});
-          return false;
-        }else if(event.keyCode == 65){ // a キー
-          if(event.shiftKey == true){ // 超信地旋回
-            socket.emit('my_event', {"x": -0.707, "y":0, "b":0});
-            return false;
-          }
-          socket.emit('my_event', {"x": -0.424, "y":0.424, "b":0});
-          return false;
-        }else if(event.keyCode == 32){  // space キー
-          socket.emit('my_event', {"x": 0.0, "y":0.0, "b":1});
-          return false;
-        }else if(event.keyCode == 81){  // q キー
-          socket.emit('my_event', {"x": 0.0, "y":0.0, "b":0});
-          socket.emit('my_event', {"x": 0.0, "y":0.0, "b":1});
-          socket.emit('disconnect_request');
-          return false;
-        }
-    }
+    document.onkeyup = keyup;
     </script>
 </head>
 <body>
